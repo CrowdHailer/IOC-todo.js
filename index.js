@@ -142,7 +142,8 @@ module.exports = function (context, root) {
 
 	$form.addEventListener('submit', function (event) {
 		event.preventDefault();
-		context.log($input.value);
+		context.broadcast('new-todo', $input.value);
+		$input.value = '';
 	});
 };
 
@@ -165,10 +166,11 @@ var Infrastructure = require('./core/infrastructure');
 
 Infrastructure.use('logger', require('./services/logger'), {exports: ['log', 'version'], label: 'DEBUG'});
 Infrastructure.use('dom', require('./services/dom'));
+Infrastructure.use('mediator', require('./services/mediator'), {exports: ['broadcast']});
 
 module.exports = Infrastructure;
 
-},{"./core/infrastructure":3,"./services/dom":7,"./services/logger":8}],7:[function(require,module,exports){
+},{"./core/infrastructure":3,"./services/dom":7,"./services/logger":8,"./services/mediator":9}],7:[function(require,module,exports){
 module.exports = function (context, options) {
     return {
 		querySelector: function (root, selector) {
@@ -195,6 +197,17 @@ module.exports = function (context, options) {
         info: info,
         warn: warn
     };
+};
+
+},{}],9:[function(require,module,exports){
+module.exports = function (infrastructure, options) {
+	var context = infrastructure.sandbox();
+
+    return {
+		broadcast: function (channel, message) {
+			context.log(channel, message);
+		}
+	};
 };
 
 },{}]},{},[5]);
