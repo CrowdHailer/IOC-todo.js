@@ -1,10 +1,20 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (window) {
-	'use strict';
+'use strict';
 
-	// Your starting point. Enjoy the ride!
+var features = {};
 
-})(window);
+function Application(context, root) {
+	context.logger.log('hello');
+	context.log('helo')
+	console.log(context.version);
+
+}
+
+Application.init = function (context, root) {
+	return new Application(context, root);
+};
+
+module.exports = Application;
 
 },{}],2:[function(require,module,exports){
 var enviroment = window;
@@ -21,46 +31,98 @@ enviroment.todo = App.init(infrastructure.sandbox(), root);
 },{"./app":1,"./infrastructure":3}],3:[function(require,module,exports){
 'use strict';
 
-var base, Base;
+var services = {};
 
-Base = function (argument) {
-	var services = {};
-	this.use = function () {
-		console.log(arguments);
-		console.log(this);
+function Sandbox(infrastructure) {
+	this.infrastructure = infrastructure;
+}
+
+Sandbox.prototype.getService = function (){
+    return this.infrastructure.getService.apply(this.infrastructure, arguments);
+};
+
+function Infrastructure(global, options) {
+	this.getGlobal = function (name) {
+        if (name in global) { return global[name]; }
+        return null;
+    };
+	this.getService = function (name) {
+		var service = services[name],
+	        instance = service.instance,
+	        infrastructure = this;
+
+	    if (instance) { return instance; }
+
+	    instance = service.factory(infrastructure, service.options);
+	    service.instance = instance;
+
+	    return instance;
 	};
-	this.services = function () {
-		return services
-	}
-};
-function Infrastructure() {
-	// body...
-}
-Base.prototype.init = function (global, options) {
-	return new Infrastructure(this.services());
-};
-
-Base.construct = function (builder) {
-	var child = new this();
-	builder(child);
-	return child;
-};
-
-
-
-var loggerFactory = function (argument) {
-	// body...
 }
 
-base = Base.construct(function(core){
-	core.use('logger', loggerFactory, {label: 'DEBUG', exports: ['log']});
-});
+// engage
+// employ
+// utilize
+// implement
+Infrastructure.use = function (name, factory, options) {
+	// separate services object
+    // this.services.add(factory, options)
+    // Throws custom error
+    services[name] = {
+        factory: factory,
+        options: options,
+        instance: null
+    };
+
+	Object.defineProperty(Sandbox.prototype, name, {get: function () {
+		return this.getService(name);
+	}});
+
+	var exports = options.exports;
+
+    if (exports) {
+        var method = exports[0];
+		Object.defineProperty(Sandbox.prototype, method, {get: function () {
+			return this.getService(name)[method];
+		}});
+        var method2 = exports[1];
+		console.log(method2);
+		Object.defineProperty(Sandbox.prototype, method2, {get: function () {
+			return this.getService(name)[method2];
+		}});
+    }
+};
+
+// context
+Infrastructure.prototype.sandbox = function (first_argument) {
+	return new Sandbox(this);
+};
+
+// create
+Infrastructure.init = function (world, options) {
+	return new this(world, options);
+};
 
 
-module.exports = base;
+function LoggerFactory(context, options) {
+    options = options || {label: ''};
+    var label = options.label + ':'
 
-function Services() {
-	// body...
+    var console = context.getGlobal('console'),
+        log = console.log.bind(console, label),
+        info = console.info.bind(console, label),
+        warn = console.warn.bind(console, label);
+
+    return {
+        log: log,
+        info: info,
+        warn: warn,
+		version: 7
+    };
 }
+
+Infrastructure.use('logger', LoggerFactory, {exports: ['log', 'version'], label: 'Mwahh'});
+
+module.exports = Infrastructure;
 
 },{}]},{},[2]);

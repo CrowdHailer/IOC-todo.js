@@ -1,6 +1,16 @@
-(function (window) {
-	'use strict';
+'use strict';
 
-	// Your starting point. Enjoy the ride!
+var features = {};
 
-})(window);
+function Application(context, root) {
+	context.logger.log('hello');
+	context.log('helo')
+	console.log(context.version);
+
+}
+
+Application.init = function (context, root) {
+	return new Application(context, root);
+};
+
+module.exports = Application;
