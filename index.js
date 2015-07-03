@@ -27,14 +27,23 @@ function Application(context, root) {
 }
 
 // animate - bad because of animation
-Application.prototype.startAll = function (first_argument) {
+Application.prototype.startAll = function (root) {
 	// this.context.log(this.root)
 	// TODO multiple startups
 	// TODO handle missing
-	var element = this.root.querySelector('[data-feature]');
-	var feature = element.dataset.feature
-	// each feature to get own context
-	features[feature].factory(this.context, element);
+	var featureElements = root.querySelectorAll('[data-feature]');
+	for (var i = 0, len = featureElements.length; i < len; i++) {
+		this.start(featureElements[i]);
+	}
+};
+
+Application.prototype.start = function (featureElement) {
+	var featureName = featureElement.dataset.feature;
+	var feature = features[featureName];
+
+	if (feature) {
+		feature.factory(this.context, featureElement);
+	}
 };
 
 // options live on datalist
@@ -46,7 +55,7 @@ Application.mount = function (hook, factory) {
 
 Application.init = function (context, root) {
 	var app = new Application(context, root);
-	app.startAll();
+	app.startAll(root);
 	return app;
 };
 
