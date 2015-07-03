@@ -1,7 +1,18 @@
 {
+  "name": "ioc-todo",
+  "version": "0.1.0",
+  "description": "Inversion of control architecture for example todo MVC app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "watchify js/index.js -o index.js"
+  },
   "private": true,
   "dependencies": {
     "todomvc-app-css": "^2.0.0",
     "todomvc-common": "^1.0.0"
+  },
+  "devDependencies": {
+    "watchify": "^3.2.3"
   }
 }
