@@ -1,6 +1,19 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+var Application = require('./core/application');
+
+Application.mount('clear-completed', function (context, root) {
+	root.addEventListener('click', function (evt) {
+		context.log('clicked');
+	});
+});
+
+module.exports = Application;
+
+},{"./core/application":2}],2:[function(require,module,exports){
+'use strict';
+
 var features = {};
 
 function Application(context, root) {
@@ -33,27 +46,9 @@ Application.init = function (context, root) {
 	return app;
 };
 
-Application.mount('clear-completed', function (context, root) {
-	root.addEventListener('click', function (evt) {
-		context.log('clicked');
-	})
-})
-
 module.exports = Application;
 
-},{}],2:[function(require,module,exports){
-var enviroment = window;
-var root = window.document;
-var options = {debug: true};
-
-var App = require('./app');
-var Infrastructure = require('./infrastructure');
-
-var infrastructure = Infrastructure.init(enviroment, options);
-
-enviroment.todo = App.init(infrastructure.sandbox(), root);
-
-},{"./app":1,"./infrastructure":3}],3:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 
 var services = {};
@@ -110,11 +105,6 @@ Infrastructure.use = function (name, factory, options) {
 		Object.defineProperty(Sandbox.prototype, method, {get: function () {
 			return this.getService(name)[method];
 		}});
-        var method2 = exports[1];
-		console.log(method2);
-		Object.defineProperty(Sandbox.prototype, method2, {get: function () {
-			return this.getService(name)[method2];
-		}});
     }
 };
 
@@ -128,10 +118,33 @@ Infrastructure.init = function (world, options) {
 	return new this(world, options);
 };
 
+module.exports = Infrastructure;
 
-function LoggerFactory(context, options) {
+},{}],4:[function(require,module,exports){
+var enviroment = window;
+var root = window.document;
+var options = {debug: true};
+
+var App = require('./app');
+var Infrastructure = require('./infrastructure');
+
+var infrastructure = Infrastructure.init(enviroment, options);
+
+enviroment.todo = App.init(infrastructure.sandbox(), root);
+
+},{"./app":1,"./infrastructure":5}],5:[function(require,module,exports){
+'use strict';
+
+var Infrastructure = require('./core/infrastructure');
+
+Infrastructure.use('logger', require('./services/logger'), {exports: ['log', 'version'], label: 'DEBUG'});
+
+module.exports = Infrastructure;
+
+},{"./core/infrastructure":3,"./services/logger":6}],6:[function(require,module,exports){
+module.exports = function (context, options) {
     options = options || {label: ''};
-    var label = options.label + ':'
+    var label = options.label + ':';
 
     var console = context.getGlobal('console'),
         log = console.log.bind(console, label),
@@ -141,13 +154,8 @@ function LoggerFactory(context, options) {
     return {
         log: log,
         info: info,
-        warn: warn,
-		version: 7
+        warn: warn
     };
-}
+};
 
-Infrastructure.use('logger', LoggerFactory, {exports: ['log', 'version'], label: 'DEBUG'});
-
-module.exports = Infrastructure;
-
-},{}]},{},[2]);
+},{}]},{},[4]);
