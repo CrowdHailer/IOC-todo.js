@@ -11,9 +11,12 @@
 	</head>
 	<body>
 		<section class="todoapp">
-			<header class="header">
+			<header class="header" data-feature="new-todo">
 				<h1>todos</h1>
-				<input class="new-todo" placeholder="What needs to be done?" autofocus>
+				<!-- Put in form as can be supported on backend if js limited -->
+				<form action="#" data-hook="new-todo">
+					<input class="new-todo" placeholder="What needs to be done?" autofocus>
+				</form>
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
 			<section class="main">

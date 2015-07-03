@@ -9,9 +9,11 @@ Application.mount('clear-completed', function (context, root) {
 	});
 });
 
+Application.mount('new-todo', require('./features/new-todo'))
+
 module.exports = Application;
 
-},{"./core/application":2}],2:[function(require,module,exports){
+},{"./core/application":2,"./features/new-todo":4}],2:[function(require,module,exports){
 'use strict';
 
 var features = {};
@@ -27,6 +29,8 @@ function Application(context, root) {
 // animate - bad because of animation
 Application.prototype.startAll = function (first_argument) {
 	// this.context.log(this.root)
+	// TODO multiple startups
+	// TODO handle missing
 	var element = this.root.querySelector('[data-feature]');
 	var feature = element.dataset.feature
 	// each feature to get own context
@@ -98,6 +102,7 @@ Infrastructure.use = function (name, factory, options) {
 		return this.getService(name);
 	}});
 
+	options = options || {};
 	var exports = options.exports;
 
     if (exports) {
@@ -121,6 +126,18 @@ Infrastructure.init = function (world, options) {
 module.exports = Infrastructure;
 
 },{}],4:[function(require,module,exports){
+module.exports = function (context, root) {
+	var $ = context.dom;
+	var $form = $.queryHook(root, 'new-todo');
+	var $input = $.querySelector($form, 'input');
+
+	$form.addEventListener('submit', function (event) {
+		event.preventDefault();
+		context.log($input.value);
+	});
+};
+
+},{}],5:[function(require,module,exports){
 var enviroment = window;
 var root = window.document;
 var options = {debug: true};
@@ -132,16 +149,29 @@ var infrastructure = Infrastructure.init(enviroment, options);
 
 enviroment.todo = App.init(infrastructure.sandbox(), root);
 
-},{"./app":1,"./infrastructure":5}],5:[function(require,module,exports){
+},{"./app":1,"./infrastructure":6}],6:[function(require,module,exports){
 'use strict';
 
 var Infrastructure = require('./core/infrastructure');
 
 Infrastructure.use('logger', require('./services/logger'), {exports: ['log', 'version'], label: 'DEBUG'});
+Infrastructure.use('dom', require('./services/dom'));
 
 module.exports = Infrastructure;
 
-},{"./core/infrastructure":3,"./services/logger":6}],6:[function(require,module,exports){
+},{"./core/infrastructure":3,"./services/dom":7,"./services/logger":8}],7:[function(require,module,exports){
+module.exports = function (context, options) {
+    return {
+		querySelector: function (root, selector) {
+			return root.querySelector(selector);
+		},
+		queryHook: function (root, hook) {
+			return this.querySelector(root, '[data-hook~=' + hook + ']');
+		}
+	};
+};
+
+},{}],8:[function(require,module,exports){
 module.exports = function (context, options) {
     options = options || {label: ''};
     var label = options.label + ':';
@@ -158,4 +188,4 @@ module.exports = function (context, options) {
     };
 };
 
-},{}]},{},[4]);
+},{}]},{},[5]);

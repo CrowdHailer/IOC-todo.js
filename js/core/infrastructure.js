@@ -47,6 +47,7 @@ Infrastructure.use = function (name, factory, options) {
 		return this.getService(name);
 	}});
 
+	options = options || {};
 	var exports = options.exports;
 
     if (exports) {

@@ -13,6 +13,8 @@ function Application(context, root) {
 // animate - bad because of animation
 Application.prototype.startAll = function (first_argument) {
 	// this.context.log(this.root)
+	// TODO multiple startups
+	// TODO handle missing
 	var element = this.root.querySelector('[data-feature]');
 	var feature = element.dataset.feature
 	// each feature to get own context

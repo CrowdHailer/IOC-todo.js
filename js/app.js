@@ -8,4 +8,6 @@ Application.mount('clear-completed', function (context, root) {
 	});
 });
 
+Application.mount('new-todo', require('./features/new-todo'))
+
 module.exports = Application;
