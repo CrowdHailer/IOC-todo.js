@@ -90,6 +90,6 @@ function LoggerFactory(context, options) {
     };
 }
 
-Infrastructure.use('logger', LoggerFactory, {exports: ['log', 'version'], label: 'Mwahh'});
+Infrastructure.use('logger', LoggerFactory, {exports: ['log', 'version'], label: 'DEBUG'});
 
 module.exports = Infrastructure;
